@@ -2,6 +2,25 @@
 
 Split keyboard configuration for kanata with custom layers, chords, and tap-hold modifiers.
 
+## Cross-Platform Support
+
+This configuration is portable between Linux (i3/sway) and Windows (GlazeWM):
+
+- **Linux**: Use `kanata.kbd` (Meta/Super key for window management)
+- **Windows**: Use `kanata-windows.kbd` (Alt key for GlazeWM)
+
+### Generating Windows Config
+
+After making changes to `kanata.kbd`, regenerate the Windows version:
+
+```bash
+./generate-windows-config.sh
+```
+
+This automatically converts all `M-` (Meta) bindings to `A-` (Alt) bindings for Windows/GlazeWM compatibility.
+
+**Important**: Always edit `kanata.kbd` (the Linux version) and regenerate. Do not edit `kanata-windows.kbd` directly as it will be overwritten.
+
 ## Hardware
 - Split keyboard (QMK/Vial) with timing delays between halves
 - Requires extended chord timeouts (100ms instead of 50ms) for cross-hand chords
