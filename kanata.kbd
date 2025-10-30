@@ -122,7 +122,7 @@
 (deflayer ctl
   C-1      C-2      C-3      C-4      C-5      C-6      C-7      C-8      C-9      C-0
   C-q      C-w      C-e      C-r      C-t      C-y      C-u      C-i      C-o      C-p
-  C-a      C-s      C-d      C-f      C-g      C-h      C-j      C-k      C-l      C-;      C-'
+   C-a      C-s      C-d      C-f      C-S-t    C-h      C-j      C-k      C-l      C-;      C-'
   C-z      C-x      C-c      C-v      C-b      C-n      C-m      C-,      C-.      C-/
                              _        _        @raltctl _
 )
