@@ -46,10 +46,12 @@ How it fits together:
 - `kanata.service` runs kanata with `--port 127.0.0.1:7070`, which streams
   newline-terminated JSON events (`{"LayerChange":{"new":"sym"}}`).
 - `tools/layer-overlay.py` (unit: `kanata-layer-overlay.service`) subscribes to
-  those events. It waits `KANATA_OVERLAY_DEBOUNCE` seconds (500ms default)
-  before showing, so a quick tap of a layer key you already know flashes
-  nothing. Switching between layers while visible updates it immediately;
-  returning to `base` hides it.
+  those events. Each layer has its own delay before it appears — 120ms for
+  `sym`, `KANATA_OVERLAY_DEBOUNCE` (500ms) for everything else — so a quick tap
+  of a layer you already know flashes nothing while the layer you keep
+  forgetting is there almost instantly. Switching between layers while visible
+  updates it immediately; returning to `base` hides it. Tune the per-layer
+  values in the `DELAYS` map at the top of the script.
 - `tools/layer_map.py` turns `defsrc` + `deflayer` into a display grid:
   output chords become glyphs for the `us` layout (`S-1` → `!`, `S-grv` → `~`),
   `tap-hold` shows `tap/hold`, aliases and `multi` are resolved.

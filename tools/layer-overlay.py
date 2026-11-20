@@ -2,9 +2,9 @@
 """Watch kanata layer changes and show the Omarchy shell layer overlay.
 
 kanata runs with `--port 127.0.0.1:7070`, which streams newline-terminated
-JSON events. On every LayerChange we wait KANATA_OVERLAY_DEBOUNCE seconds
-(500ms by default) before showing the layer, so quick taps of a layer key
-you already know don't flash anything. Changes between layers while the
+JSON events. On every LayerChange we wait a per-layer delay before showing
+(500ms by default, 120ms for `sym`; see DELAYS) so quick taps of a layer
+key you already know don't flash anything. Changes between layers while the
 overlay is visible update it immediately; returning to `base` hides it.
 
 The key map itself comes from layer_map.py, which reads config.kbd, so the
@@ -25,9 +25,20 @@ import layer_map  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("KANATA_TCP_PORT", "7070"))
-DEBOUNCE = float(os.environ.get("KANATA_OVERLAY_DEBOUNCE", "0.5"))
 HIDDEN = {"base", "game"}
+
+# Delay before the card appears, per layer, measured from the moment the layer
+# becomes active. Layers not listed use DEFAULT_DELAY. Short values make a
+# layer feel instant; the point of the delay is only to keep quick taps you
+# already know from flashing a card. `sym` is the one that needs help, so it
+# gets a much shorter wait than the rest.
+DEFAULT_DELAY = float(os.environ.get("KANATA_OVERLAY_DEBOUNCE", "0.5"))
+DELAYS = {"sym": 0.12}
 IPC_TARGET = "kanata-layers"
+
+
+def delay_for(layer: str) -> float:
+    return DELAYS.get(layer, DEFAULT_DELAY)
 
 
 def log(message: str) -> None:
@@ -104,7 +115,7 @@ class Overlay:
             return
         if self.pending and self.pending[0] == layer:
             return
-        self.pending = (layer, time.monotonic() + DEBOUNCE)
+        self.pending = (layer, time.monotonic() + delay_for(layer))
 
 
 def stream(overlay: Overlay) -> None:
