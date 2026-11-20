@@ -25,15 +25,14 @@ import layer_map  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("KANATA_TCP_PORT", "7070"))
+# Layers worth showing at all. Since the config moved to native modifiers,
+# holding a thumb is deliberate (rctrl for num, then lalt for sym), so there is
+# nothing to debounce by default. A layer that barely changes the map is still
+# skipped: `sft` remaps a single key, so a card for it would be noise.
 HIDDEN = {"base", "game"}
-
-# Delay before the card appears, per layer, measured from the moment the layer
-# becomes active. Layers not listed use DEFAULT_DELAY. Short values make a
-# layer feel instant; the point of the delay is only to keep quick taps you
-# already know from flashing a card. `sym` is deliberate (rctrl then alt), so
-# it shows immediately; the rest wait to filter out taps.
-DEFAULT_DELAY = float(os.environ.get("KANATA_OVERLAY_DEBOUNCE", "0.5"))
-DELAYS = {"sym": 0.0}
+MIN_MAPPED = 3
+DEFAULT_DELAY = float(os.environ.get("KANATA_OVERLAY_DEBOUNCE", "0"))
+DELAYS = {}
 IPC_TARGET = "kanata-layers"
 
 
@@ -61,6 +60,7 @@ def ipc(*args: str) -> None:
 class Overlay:
     def __init__(self) -> None:
         self.layers = {}
+        self.mapped = {}
         self.stamp = None
         self.shown = None
         self.pending = None  # (layer, deadline)
@@ -75,6 +75,10 @@ class Overlay:
             return
         try:
             self.layers = layer_map.load()
+            self.mapped = {
+                name: sum(1 for row in layer["rows"] for cell in row if cell["out"])
+                for name, layer in self.layers.items()
+            }
             self.stamp = stamp
             log(f"loaded {len(self.layers)} layers from {layer_map.CONFIG}")
         except Exception as exc:  # noqa: BLE001 - never die on a bad edit
@@ -107,6 +111,9 @@ class Overlay:
     def on_layer(self, layer: str) -> None:
         self.load_maps()
         if layer in HIDDEN or layer not in self.layers:
+            self.hide()
+            return
+        if self.mapped.get(layer, 0) < MIN_MAPPED:
             self.hide()
             return
         if self.shown is not None:
