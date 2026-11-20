@@ -3,7 +3,7 @@
 
 kanata runs with `--port 127.0.0.1:7070`, which streams newline-terminated
 JSON events. On every LayerChange we wait a per-layer delay before showing
-(500ms by default, 120ms for `sym`; see DELAYS) so quick taps of a layer
+(500ms by default, none for `sym`; see DELAYS) so quick taps of a layer
 key you already know don't flash anything. Changes between layers while the
 overlay is visible update it immediately; returning to `base` hides it.
 
@@ -30,10 +30,10 @@ HIDDEN = {"base", "game"}
 # Delay before the card appears, per layer, measured from the moment the layer
 # becomes active. Layers not listed use DEFAULT_DELAY. Short values make a
 # layer feel instant; the point of the delay is only to keep quick taps you
-# already know from flashing a card. `sym` is the one that needs help, so it
-# gets a much shorter wait than the rest.
+# already know from flashing a card. `sym` is deliberate (rctrl then alt), so
+# it shows immediately; the rest wait to filter out taps.
 DEFAULT_DELAY = float(os.environ.get("KANATA_OVERLAY_DEBOUNCE", "0.5"))
-DELAYS = {"sym": 0.12}
+DELAYS = {"sym": 0.0}
 IPC_TARGET = "kanata-layers"
 
 
@@ -143,6 +143,9 @@ def stream(overlay: Overlay) -> None:
                 change = message.get("LayerChange")
                 if isinstance(change, dict) and "new" in change:
                     overlay.on_layer(str(change["new"]))
+                    # A zero-delay layer should not wait for the next socket
+                    # timeout tick below.
+                    overlay.run()
 
 
 def main() -> int:
