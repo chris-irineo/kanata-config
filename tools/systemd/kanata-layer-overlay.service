@@ -1,0 +1,13 @@
+[Unit]
+Description=Kanata layer overlay watcher (kanata TCP -> Omarchy shell)
+Documentation=file://%h/.config/kanata/README.md
+After=kanata.service graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/.config/kanata/tools/layer-overlay.py
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

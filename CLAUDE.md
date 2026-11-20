@@ -22,6 +22,13 @@ systemctl --user restart kanata                    # apply
 ~/.config/kanata/generate-windows-config.sh
 ```
 
+The service runs with `--port 127.0.0.1:7070`; `tools/layer-overlay.py`
+(`kanata-layer-overlay.service`) subscribes to `LayerChange` events and shows
+the layer card via the Omarchy plugin `chris.kanata-layers`. The card's content
+is rendered from `config.kbd` by `tools/layer_map.py` at show time, so a config
+edit is reflected without touching the plugin. No TCP `msg` subcommand exists
+in kanata 1.12.0 — the watcher speaks the protocol directly.
+
 ## Current config shape
 
 - `defcfg`: `process-unmapped-keys yes`

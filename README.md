@@ -10,7 +10,10 @@ Split-keyboard configuration for [kanata](https://github.com/jtroo/kanata) with 
 | `~/.config/kanata/kanata-windows.kbd` | Generated for Windows — do not edit |
 | `~/.config/kanata/setup-kanata.sh` | One-time/idempotent permission + service setup |
 | `~/.config/kanata/restart-kanata.sh` | Validate config and restart the service |
-| `~/.config/systemd/user/kanata.service` | The running service (`--cfg ~/.config/kanata/config.kbd`) |
+| `~/.config/kanata/tools/layer_map.py` | Render a layer from `config.kbd` (also used by the overlay) |
+| `~/.config/kanata/tools/layer-overlay.py` | Watcher that drives the on-screen layer overlay |
+| `~/.config/systemd/user/kanata.service` | The running service (`--cfg ~/.config/kanata/config.kbd --port 127.0.0.1:7070`) |
+| `~/.config/systemd/user/kanata-layer-overlay.service` | Symlink to `tools/systemd/kanata-layer-overlay.service` |
 | `/etc/udev/rules.d/99-kanata.rules` | Grants the `kanata` group keyboard + uinput access (root) |
 
 There is a single copy of the config. Older notes referenced `~/.kanata/kanata.kbd` and `/etc/kanata/kanata-config.kbd`; both are gone — the git history of this repo still has them.
@@ -32,6 +35,43 @@ If you change the Linux config, regenerate the Windows variant:
 ```
 
 It converts every `M-` (Meta) binding to `A-` (Alt) for GlazeWM. Always edit `config.kbd` and regenerate; `kanata-windows.kbd` is overwritten.
+
+## Layer overlay
+
+While a special layer is held, a card at the bottom of the screen shows that
+layer's key map — generated from `config.kbd`, so it cannot go stale.
+
+How it fits together:
+
+- `kanata.service` runs kanata with `--port 127.0.0.1:7070`, which streams
+  newline-terminated JSON events (`{"LayerChange":{"new":"sym"}}`).
+- `tools/layer-overlay.py` (unit: `kanata-layer-overlay.service`) subscribes to
+  those events. It waits `KANATA_OVERLAY_DEBOUNCE` seconds (500ms default)
+  before showing, so a quick tap of a layer key you already know flashes
+  nothing. Switching between layers while visible updates it immediately;
+  returning to `base` hides it.
+- `tools/layer_map.py` turns `defsrc` + `deflayer` into a display grid:
+  output chords become glyphs for the `us` layout (`S-1` → `!`, `S-grv` → `~`),
+  `tap-hold` shows `tap/hold`, aliases and `multi` are resolved.
+- The card itself is the Omarchy shell plugin
+  `~/.config/omarchy/plugins/chris.kanata-layers/` (IPC target
+  `kanata-layers`), so it follows the current theme and never takes focus.
+
+`base` and `game` are excluded (`HIDDEN` in `layer-overlay.py`); `game` is a
+switched layer, so its overlay would stay up.
+
+Handy commands:
+
+```bash
+~/.config/kanata/tools/layer_map.py sym     # print one layer's map
+~/.config/kanata/tools/layer_map.py --json  # everything, machine-readable
+systemctl --user status kanata-layer-overlay
+journalctl --user -u kanata-layer-overlay -e
+```
+
+If the card ever fails to appear, check that the plugin is enabled in
+`~/.config/omarchy/shell.json` (`plugins` → `{"id": "chris.kanata-layers"}`)
+and that `omarchy-shell kanata-layers ping` answers `ok`.
 
 ## Permissions on Omarchy
 
