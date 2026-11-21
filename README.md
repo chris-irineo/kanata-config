@@ -54,15 +54,18 @@ navigates, Super+Shift moves.** Defined in `~/.config/hypr/bindings.lua`:
 | `spc` + `n` | Omarchy menu |
 | `spc` + `semicolon` | scratchpad (`spc+ralt+;` = move window to it) |
 | `spc` + `h b r u z y` | fullscreen / grouping / split / layout / keybinds |
-| `spc+ralt` + `b r` | full-width / pull out of group |
+| `spc+ralt` + `b` | full-width |
+| `spc+ralt` + `v t r` | browser / tmux / herdr — the launch cluster (native `SUPER+SHIFT/ALT/CTRL+RETURN` defaults stay as fallbacks) |
 | `spc` + `i` | input language (`spc+ralt+i` = back) — Omarchy defaults |
 
 Omarchy defaults that already work with no bind: `spc+q/w` close, `spc+t` float,
 `spc+m` minimize, `spc+c/v/x/a` universal clipboard, `spc+tab` next workspace,
 `spc` + tap `ralt` (Super+Return) terminal.
 
-**Deferred (TBD):** Tmux (`SUPER+ALT+RETURN`) and Herdr (`SUPER+CTRL+RETURN`) keep
-their defaults but have no thumb-reachable home yet. The Apps dock is unused.
+**Launch cluster:** Tmux (`spc+ralt+t`) and Herdr (`spc+ralt+r`) join browser
+(`spc+ralt+v`) on the move layer; their native `SUPER+ALT/CTRL+RETURN`
+defaults stay as fallbacks. `spc+r` (toggle grouping) is vestigial — groups
+unused. The Apps dock is unused.
 
 ## Files
 

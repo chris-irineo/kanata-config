@@ -102,8 +102,9 @@ workspace helpers like `o.workspaces.focus(N)` — don't substitute raw
 
 ## TBD (documented in bindings.lua)
 
-- Tmux (`SUPER+ALT+RETURN`) and Herdr (`SUPER+CTRL+RETURN`) have no
-  thumb-reachable home; user hasn't decided.
+- Tmux/Herdr are re-homed on the SUPER+SHIFT launch cluster (`spc+ralt` + t/r,
+  Launcher section of bindings.lua); native SUPER+ALT/CTRL+RETURN defaults
+  remain as fallbacks.
 - `omarchy_preinstalled_bindings = false` in `hyprland.lua` would free all
   unused app/webapp binds wholesale (user doesn't use app launches).
 
