@@ -1,5 +1,7 @@
 SYM LAYER (rctl + lalt + key)
 ─────────────────────────────
 ~  `  [  ]  {     }  |  \  <  >
-!  @  #  $  %     -  =  +  >  :  '
-^  &  *  (  )     _  `  /  ,  .
+!  @  #  $  %     -  =  +  "  :  '
+^  &  *  (  )     _  /  ,  .  ?
+
+? = shift of the / key · " at l · / at m · , . stay at their base keys

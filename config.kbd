@@ -89,18 +89,29 @@
                               _        @spcctl  _        _
 )
 
-;; Num (rctl) — digits and arrows. Hold lalt (rctl first) for the sym layer.
+;; Num (rctl) — digits + one-hand editing pad. hjkl = vim arrows; y/o
+;; (same columns, one row up) = word jumps — C-left/right double as
+;; browser back/forward; u = undo, i = redo, p = paste (C-S-v, the
+;; system's paste grammar); the bottom strip deletes word← char← char→
+;; word→ (n m , .). Hold ralt too and any motion SELECTS instead
+;; (ralt+rctl blocks nothing on the laptop matrix). Hold lalt (rctl
+;; first) for the sym layer.
 (deflayer num
-  /        S-8      -        S-=      =        _        _        up       _        _
-  1        2        3        4        5        _        left     down     right    _        _
-  6        7        8        9        0        _        _        _        _        _
+  /        S-8      -        S-=      =        C-left   C-z      C-S-z    C-right  C-S-v
+  1        2        3        4        5        left     down     up       right    _        _
+  6        7        8        9        0        C-bspc   bspc     del      C-del    _
                               @laltnum _        _        _
 )
 
-;; Sym (rctl, then lalt) — see sym-layer-cheatsheet.txt.
+;; Sym (rctl, then lalt) — see sym-layer-cheatsheet.txt. Getreuer
+;; structure kept: shifted digits in digit order (a..g, z..b), bracket
+;; pairs adjacent ([ ] { } on e r t y). Fixes: , . stay at their base
+;; keys and the bottom strip m , . / reads / , . ? (? = shift of the
+;; / key); l = " completes the home-row run - = + " : '. One symbol
+;; per key, no duplicates; plain ; and ' echo their base positions.
 (deflayer sym
   S-grv    grv      [        ]        S-[      S-]      S-\      \        S-,      S-.
-  S-1      S-2      S-3      S-4      S-5      -        =        S-=      S-.      S-;      '
-  S-6      S-7      S-8      S-9      S-0      S--      grv      /        ,        .
+  S-1      S-2      S-3      S-4      S-5      -        =        S-=      S-'      S-;      '
+  S-6      S-7      S-8      S-9      S-0      S--      /        ,        .        S-/
                               _        _        _        _
 )

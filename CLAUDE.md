@@ -47,7 +47,7 @@ six combo layers).
     the second keypress, so a release-committed modifier lands AFTER the chord
     output (`lalt+d+f` was plain tab). Their tap values (C-bspc/ret/esc/bspc)
     are deliberate presses, not typed-through, so press-commit is typing-safe.
-- `rctl` hold = num layer (digits/arrows); `lalt` inside num = sym layer.
+- `rctl` hold = num layer (digits, hjkl arrows, editing verbs); `lalt` inside num = sym layer.
   Order matters: rctl-first for sym; lalt-first then rctl gives `Ctrl+digit`
   (browser tab jumping). Documented, intentional.
 - The physical digit row is intentionally unmapped (`process-unmapped-keys yes`):

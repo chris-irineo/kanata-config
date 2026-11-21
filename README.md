@@ -37,8 +37,12 @@ with `lalt` → **Ctrl+Shift** (the app-shortcut grammar — the laptop-safe pai
 since the matrix only blocks `,` here). Whichever end of the thumb lands first
 picks the namespace.
 
-**Num (rctl + key):** home row `a s d f g` → `1 2 3 4 5`, bottom row → `6 7 8 9 0`,
-`i j k l` → arrows. **Sym (rctl, then lalt):** see `sym-layer-cheatsheet.txt`.
+**Num (rctl + key):** `a s d f g` → `1 2 3 4 5`, `z x c v b` → `6 7 8 9 0`,
+plus a right-hand editing pad: `h j k l` → ←↓↑→ (vim), `y`/`o` (same columns,
+row above) → word jumps (`C-left`/`C-right` — also browser back/forward),
+`u`/`i` → undo/redo, `p` → paste (`C-S-v`), `n m , .` → delete
+word←/char←/char→/word→. Hold `ralt` too and any motion **selects** instead.
+**Sym (rctl, then lalt):** see `sym-layer-cheatsheet.txt`.
 
 ## Window management (Omarchy side)
 
