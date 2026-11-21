@@ -2,59 +2,101 @@
 
 ## Ground truth
 
-**The only config file is `~/.config/kanata/config.kbd`.** Edit it in place; never
-create a second copy, and never work in `~/.kanata/` or `/etc/kanata/` — those
-paths are historical and were removed (git history in this repo still has them,
-which is why old notes may mention `kanata.kbd`).
+**Two files define the whole input system:**
+
+1. `~/.config/kanata/config.kbd` — the remap (this repo)
+2. `~/.config/hypr/bindings.lua` — Omarchy keybinds that the remap targets
+
+Never edit anything else: `archive/` is frozen history, and the `*.conf` files in
+`~/.config/hypr/` are dead pre-quattro leftovers (Hyprland loads `hyprland.lua`,
+which `require`s `bindings.lua`).
 
 - Git repo = this directory (remote: `chriskevini/kanata-config`, branch `main`)
 - Hardware: split keyboard (QMK/Vial), hence the 100ms chord timeout
 - Service: `~/.config/systemd/user/kanata.service`, started with
-  `--cfg ~/.config/kanata/config.kbd`
-- Derived file: `kanata-windows.kbd` is generated, never edited by hand
+  `--cfg ~/.config/kanata/config.kbd` and `--port 127.0.0.1:7070` (layer overlay
+  watcher). The overlay card content renders from `config.kbd` at show time.
+  No debounce by default (`num`/`sym` are deliberate); layers mapping fewer
+  than `MIN_MAPPED` (3) keys are skipped, which is what keeps the thin `sft`
+  layer from flashing a card.
+
+## Architecture (do not "fix" into layers)
+
+`lalt`, `spc`, `ralt` holds **emit real OS modifier keycodes** (`lctl`, `lmet`,
+`lsft`). Combinations compose at the OS level — that is the design, so never
+replace an emission with a `C-`/`M-` remap layer: a layer mapping produces
+exactly one key and does NOT compose (the pre-2026-11 config did this and needed
+six combo layers).
+
+- `ralt` = `(multi lsft (layer-while-held sft))`: Shift emission + thin layer whose
+  only remap is `lalt` (tap `bspc`, hold `lctl`). Everything else in `sft` is `_`.
+- Tap-hold VARIANT POLICY — per key, do not unify (each choice fixes a real bug):
+  - `spc` = `tap-hold-release`. Space is rolled into the next letter constantly
+    while typing; release-commit keeps natural rolls (space released first) as
+    taps. With `tap-hold-press`, every roll fired `SUPER+<letter>` and closed
+    windows (`SUPER+W`). Consequence: `spc+d+f` gives plain tab (chords fire at
+    the second keypress, before spc's release-commit) — pre-hold spc ≥300ms for
+    `M-tab`, or use workspace binds instead.
+  - `lalt`/`ralt`/`rctl`/`@laltsft` = `tap-hold-press`. Chords (`d+f`) fire at
+    the second keypress, so a release-committed modifier lands AFTER the chord
+    output (`lalt+d+f` was plain tab). Their tap values (C-bspc/ret/esc/bspc)
+    are deliberate presses, not typed-through, so press-commit is typing-safe.
+- `rctl` hold = num layer (digits/arrows); `lalt` inside num = sym layer.
+  Order matters: rctl-first for sym; lalt-first then rctl gives `Ctrl+digit`
+  (browser tab jumping). Documented, intentional.
+- The physical digit row is intentionally unmapped (`process-unmapped-keys yes`):
+  digits/symbols come from num/sym layers and the emission makes passthrough keys
+  pick up held modifiers (`spc+6` → `SUPER+6`).
+- One chord: `d+f` → tab. Chorded keys: `d`, `f` only.
+- Layers: `base`, `sft` (thin), `num`, `sym`.
 
 ## Workflow
 
 ```bash
+kanata --list                                     # FIRST: which keyboard is kanata mapping?
 kanata --check --cfg ~/.config/kanata/config.kbd   # validate
-systemctl --user restart kanata                    # apply
-# after editing config.kbd for Windows users:
-~/.config/kanata/generate-windows-config.sh
+~/.config/kanata/restart-kanata.sh                 # apply (script also validates)
+
+# Test behavior WITHOUT touching the keyboard — feed it an event script:
+#   echo "t:500 d:lalt t:30 d:ralt t:200 d:d t:40 d:f" > /tmp/sim.txt
+#   kanata_simulated_input -c ~/.config/kanata/config.kbd -s /tmp/sim.txt
+# Format: t:<ms> delay, d:<key> press, u:<key> release.
+# Built from https://github.com/jtroo/kanata/tree/main/simulated_input (v1.12.0).
+
+# Omarchy side — auto-reloads on save, then validate:
+hyprctl reload && hyprctl configerrors
+omarchy menu keybindings --print                   # inspect live binds
 ```
 
-The service runs with `--port 127.0.0.1:7070`; `tools/layer-overlay.py`
-(`kanata-layer-overlay.service`) subscribes to `LayerChange` events and shows
-the layer card via the Omarchy plugin `chris.kanata-layers`. Show delay is
-per-layer (`DELAYS` in the script): none for `sym`, 500ms for the rest. The card's content
-is rendered from `config.kbd` by `tools/layer_map.py` at show time, so a config
-edit is reflected without touching the plugin. No TCP `msg` subcommand exists
-in kanata 1.12.0 — the watcher speaks the protocol directly.
-
-## Current config shape
-
-- `defcfg`: `process-unmapped-keys yes`
-- Timeouts: `tap-timeout 150`, `hold-timeout 300`, `short-hold-timeout 150`
-  (ralt), `chord-timeout 100` (all chords)
-- Tap-holds: `lalt` = tap `C-bspc`, hold `ctl` layer; `ralt` = tap `ret`, hold
-  `sft`; `rctl` = tap `esc`, hold `num`; `spc` = tap `spc`, hold `nav`
-  (all `tap-hold-release` except `rctl`, which is `tap-hold-press`)
-- Chords (100ms): `q+w` esc, `d+f` tab, `w+x` game layer, `c+v` `M-spc`,
-  `x+c` `M-A-spc`, `esc+tab` back to base
-- Layers: `base`, `game`, `nav`, `num`, `sym`, `sft`, `ctl`
-- `lalt` inside `num` → `sym`; `lalt` inside `sft` → `num`; `ralt` inside
-  `ctl` → `sym`
+When re-binding an existing Omarchy key: use `o.rebind(...)` (never plain
+`o.bind` on a taken key), and tell the user what the key was bound to before.
+Copy action expressions verbatim from the defaults in
+`~/.local/share/omarchy/default/hypr/bindings/*.lua` (they use per-monitor
+workspace helpers like `o.workspaces.focus(N)` — don't substitute raw
+`workspace, N` dispatchers).
 
 ## Constraints
 
-- Split-keyboard latency: do not lower `chord-timeout` below 100ms for
-  cross-hand chords.
-- Sequential layer activation (`ralt`→`lalt`, `lalt`→`ralt`) blocks keys on the
-  laptop keyboard (hardware matrix limit). Works on the split keyboard. Don't
-  "fix" it in config.
-- Keep aliases ≤8 chars, `[action][layer]` naming (e.g. `escgame`).
+- Split-keyboard latency: do not lower `chord-timeout` below 100ms.
+- Keep aliases ≤8 chars, `[action][layer]` naming (e.g. `laltnum`).
+- Anything window-manager-ish belongs in `bindings.lua`, not `config.kbd`.
+- **Laptop matrix limitation**: holding `lalt`+`ralt` on the laptop's built-in
+  keyboard blocks some keys (notably `n`) — the press never reaches kanata.
+  Do not chase these as config bugs: verify with `kanata_simulated_input`
+  (config-level truth) or on the split keyboard before debugging.
+- Before ANY combo debugging, run `kanata --list`: the split and the laptop
+  are different hardware with different behavior, and most "mysterious"
+  failures on the laptop turn out to be matrix blocks, not config bugs.
+
+## TBD (documented in bindings.lua)
+
+- Tmux (`SUPER+ALT+RETURN`) and Herdr (`SUPER+CTRL+RETURN`) have no
+  thumb-reachable home; user hasn't decided.
+- `omarchy_preinstalled_bindings = false` in `hyprland.lua` would free all
+  unused app/webapp binds wholesale (user doesn't use app launches).
 
 ## Permissions
 
-If kanata dies with "No keyboard devices were found", Omarchy stripped the
-group grant. Re-run `bash ~/.config/kanata/setup-kanata.sh`, then log out/in.
-Details in README.md.
+If kanata dies with "No keyboard devices were found", an Omarchy upgrade
+stripped the group grant. Re-run `bash ~/.config/kanata/setup-kanata.sh`, then
+log out/in. Details in README.md.

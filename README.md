@@ -1,172 +1,131 @@
 # Kanata Configuration
 
-Split-keyboard configuration for [kanata](https://github.com/jtroo/kanata) with custom layers, chords and tap-hold modifiers. Runs as a systemd user service on Omarchy/Arch, and is portable to Windows (GlazeWM).
+Split-keyboard remap for [kanata](https://github.com/jtroo/kanata) that turns the
+thumb keys into real OS-level **Ctrl / Super / Shift** modifiers. Window management
+lives in Omarchy (`~/.config/hypr/bindings.lua`), not here. Runs as a systemd user
+service on Omarchy/Arch.
+
+## The system in one glance
+
+| Thumb | Tap | Hold |
+|---|---|---|
+| `lalt` | `C-bspc` (delete word) | **Ctrl** (real `lctl` emitted) |
+| `spc` | space | **Super** (real `lmet` emitted) |
+| `ralt` | `ret` | **Shift** (real `lsft`, + thin `sft` layer) |
+| `rctl` | `esc` | **num** layer (`lalt` inside → **sym** layer) |
+
+Hold modifiers **compose** — kanata emits real keycodes, so the OS combines them:
+
+| Hold | Then press | Result |
+|---|---|---|
+| `lalt` | any key | `Ctrl-x` |
+| `spc` | any key | `Super-x` (Omarchy binds) |
+| `ralt` | any key | `Shift-x` |
+| `lalt+spc` | `v` | `Ctrl+Super+V` → Omarchy clipboard manager |
+| any combo | `d`+`f` | Tab with those modifiers (`C-tab`, `M-tab`, `C-S-tab`, …) |
+| `ralt` | tap `lalt` | plain `bspc` (char delete; `lalt` tap alone is word delete) |
+| `lalt` | digits | `Ctrl-1..0` (browser tab jumping; digits pass through) |
+
+**One chord: `d+f` = Tab** (100ms; works under every modifier combo).
+
+**Documented asymmetry:** `rctl` then `lalt` → sym layer; `lalt` then `rctl` →
+`Ctrl+digit`. Press the sym thumb (`rctl`) first for symbols.
+
+**Num (rctl + key):** home row `a s d f g` → `1 2 3 4 5`, bottom row → `6 7 8 9 0`,
+`i j k l` → arrows. **Sym (rctl, then lalt):** see `sym-layer-cheatsheet.txt`.
+
+## Window management (Omarchy side)
+
+`spc` emits Super, so Omarchy binds ARE the nav layer. Grammar: **plain Super
+navigates, Super+Shift moves.** Defined in `~/.config/hypr/bindings.lua`:
+
+| Keys | Action |
+|---|---|
+| `spc` + `a s d f g` | workspace 1–5 (digits: 6–10) |
+| `spc+ralt` + `a s d f g` | move window → workspace 1–5 (digits: 6–10) |
+| `spc` + `i j k l` | focus up/left/down/right |
+| `spc+ralt` + `i j k l` | swap window |
+| `spc` + `n` | Omarchy menu |
+| `spc` + `h b r u z y` | scratchpad / fullscreen / grouping / split / layout / keybinds |
+| `spc+ralt` + `h b r` | send to scratchpad / full-width / pull out of group |
+
+Omarchy defaults that already work with no bind: `spc+q/w` close, `spc+t` float,
+`spc+m` minimize, `spc+c/v/x/a` universal clipboard, `spc+tab` next workspace,
+`spc` + tap `ralt` (Super+Return) terminal.
+
+**Deferred (TBD):** Tmux (`SUPER+ALT+RETURN`) and Herdr (`SUPER+CTRL+RETURN`) keep
+their defaults but have no thumb-reachable home yet. The Apps dock is unused.
 
 ## Files
 
 | Path | Purpose |
 |------|---------|
-| `~/.config/kanata/config.kbd` | **The one config.** Edit this and nothing else. |
-| `~/.config/kanata/kanata-windows.kbd` | Generated for Windows — do not edit |
-| `~/.config/kanata/setup-kanata.sh` | One-time/idempotent permission + service setup |
-| `~/.config/kanata/restart-kanata.sh` | Validate config and restart the service |
-| `~/.config/kanata/tools/layer_map.py` | Render a layer from `config.kbd` (also used by the overlay) |
-| `~/.config/kanata/tools/layer-overlay.py` | Watcher that drives the on-screen layer overlay |
-| `~/.config/systemd/user/kanata.service` | The running service (`--cfg ~/.config/kanata/config.kbd --port 127.0.0.1:7070`) |
-| `~/.config/systemd/user/kanata-layer-overlay.service` | Symlink to `tools/systemd/kanata-layer-overlay.service` |
-| `/etc/udev/rules.d/99-kanata.rules` | Grants the `kanata` group keyboard + uinput access (root) |
+| `config.kbd` | **The one config** |
+| `sym-layer-cheatsheet.txt` | Symbol layer quick reference |
+| `restart-kanata.sh` / `setup-kanata.sh` | Validate+restart / permissions setup |
+| `~/.config/systemd/user/kanata.service` | Runs `--cfg ~/.config/kanata/config.kbd` (port 7070 for the layer overlay) |
+| `tools/layer_map.py` / `tools/layer-overlay.py` | Render a layer / drive the overlay card |
+| `~/.config/hypr/bindings.lua` | The Omarchy companion binds (nav grammar above) |
+| `archive/2026-11-20-legacy/` | Previous design: game layer, Windows/GlazeWM port, nav-layer remaps |
 
-There is a single copy of the config. Older notes referenced `~/.kanata/kanata.kbd` and `/etc/kanata/kanata-config.kbd`; both are gone — the git history of this repo still has them.
+## Layer overlay
+
+Holding a thumb layer shows that layer's key map in a card at the bottom of the
+screen. Since the redesign, the only layers left are deliberate ones, so the
+card appears with **no delay**: `rctl` (num), then `lalt` (sym). `base` is never
+shown, and a layer that barely changes the map is skipped automatically —
+`sft` remaps one key, so a card for it would just be noise (`MIN_MAPPED` in
+`tools/layer-overlay.py`; raise it or set a per-layer delay in `DELAYS` if a
+layer starts flashing when you don't want it).
+
+```bash
+tools/layer_map.py sym                      # print a layer's map
+systemctl --user restart kanata-layer-overlay
+journalctl --user -u kanata-layer-overlay -e
+```
+
+Card rendering lives in `~/.config/omarchy/plugins/chris.kanata-layers/` and
+reads its content from `config.kbd` at show time, so it never drifts.
 
 ## Editing workflow
 
 ```bash
-# 1. Edit ~/.config/kanata/config.kbd
-# 2. Validate (cheap, no restart needed)
-kanata --check --cfg ~/.config/kanata/config.kbd
-# 3. Apply
-~/.config/kanata/restart-kanata.sh        # or: systemctl --user restart kanata
+# Kanata side
+kanata --check --cfg ~/.config/kanata/config.kbd   # validate
+~/.config/kanata/restart-kanata.sh                 # apply
+
+# Omarchy side (bindings.lua) — auto-reloads on save; then validate:
+hyprctl reload && hyprctl configerrors
+omarchy menu keybindings --print                   # inspect live binds
 ```
-
-If you change the Linux config, regenerate the Windows variant:
-
-```bash
-~/.config/kanata/generate-windows-config.sh
-```
-
-It converts every `M-` (Meta) binding to `A-` (Alt) for GlazeWM. Always edit `config.kbd` and regenerate; `kanata-windows.kbd` is overwritten.
-
-## Layer overlay
-
-While a special layer is held, a card at the bottom of the screen shows that
-layer's key map — generated from `config.kbd`, so it cannot go stale.
-
-How it fits together:
-
-- `kanata.service` runs kanata with `--port 127.0.0.1:7070`, which streams
-  newline-terminated JSON events (`{"LayerChange":{"new":"sym"}}`).
-- `tools/layer-overlay.py` (unit: `kanata-layer-overlay.service`) subscribes to
-  those events. Each layer has its own delay before it appears — none for
-  `sym` (it shows the moment the layer activates), `KANATA_OVERLAY_DEBOUNCE`
-  (500ms) for everything else — so a quick tap of a layer you already know
-  flashes nothing while the layer you keep forgetting is there immediately.
-  Switching between layers while visible updates it right away; returning to
-  `base` hides it. Tune the per-layer values in the `DELAYS` map at the top of
-  the script.
-- `tools/layer_map.py` turns `defsrc` + `deflayer` into a display grid:
-  output chords become glyphs for the `us` layout (`S-1` → `!`, `S-grv` → `~`),
-  `tap-hold` shows `tap/hold`, aliases and `multi` are resolved.
-- The card itself is the Omarchy shell plugin
-  `~/.config/omarchy/plugins/chris.kanata-layers/` (IPC target
-  `kanata-layers`), so it follows the current theme and never takes focus.
-
-`base` and `game` are excluded (`HIDDEN` in `layer-overlay.py`); `game` is a
-switched layer, so its overlay would stay up.
-
-Handy commands:
-
-```bash
-~/.config/kanata/tools/layer_map.py sym     # print one layer's map
-~/.config/kanata/tools/layer_map.py --json  # everything, machine-readable
-systemctl --user status kanata-layer-overlay
-journalctl --user -u kanata-layer-overlay -e
-```
-
-If the card ever fails to appear, check that the plugin is enabled in
-`~/.config/omarchy/shell.json` (`plugins` → `{"id": "chris.kanata-layers"}`)
-and that `omarchy-shell kanata-layers ping` answers `ok`.
 
 ## Permissions on Omarchy
 
-Kanata's config runs as a user service and needs raw keyboard access. Omarchy migration `1787865477.sh` removes the user from the `input` group on upgrade (that group grants keylogging-level access, so Omarchy drops it unless `xpadneo-dkms` or `ydotool` is installed). Kanata legitimately needs it but isn't on the keep-list, so an upgrade silently breaks it:
+Kanata's config runs as a user service and needs raw keyboard access. Omarchy
+migration `1787865477.sh` removes the user from the `input` group on upgrade, so
+an upgrade can silently break kanata:
 
 ```
 [ERROR] failed to open keyboard device(s): No keyboard devices were found.
 ```
 
-Fix by re-running the setup script:
+Fix by re-running `bash ~/.config/kanata/setup-kanata.sh`, then log out/in and
+`systemctl --user start kanata`. It uses a dedicated `kanata` group + udev rule
+(`/etc/udev/rules.d/99-kanata.rules`) — upgrade- and reinstall-proof, and keeps
+the user out of the keylogging-capable `input` group.
 
-```bash
-bash ~/.config/kanata/setup-kanata.sh
-# then log out and back in (group membership applies to new sessions only)
-systemctl --user start kanata
-kanata --list            # should list your keyboard
-journalctl --user -u kanata -e
-```
+## Hardware notes
 
-It creates a dedicated `kanata` group plus a udev rule granting that group read access to physical keyboards and write access to `/dev/uinput`.
-
-| Approach | Survives upgrades | Survives fresh install | Security posture |
-|----------|-------------------|------------------------|------------------|
-| `usermod -aG input $USER` | yes (migration is one-shot, already marked done) | **no** — re-stripped on fresh install | reopens the keylogging risk Omarchy closed |
-| dedicated `kanata` group + udev rule | yes | **yes** | least privilege; stays out of `input` |
-
-The udev rule lives in `/etc/udev/rules.d/` (not touched by Omarchy) and no Omarchy migration references a `kanata` group, so this is upgrade- and reinstall-proof.
-
-## Hardware
-
-- Split keyboard (QMK/Vial) with timing delays between halves
-- Chord timeouts are 100ms rather than 50ms to tolerate cross-hand latency
-- Works on laptop keyboard with the documented limitations below
-
-## Layers
-
-### Base
-- **lalt**: tap=`C-bspc`, hold=`ctl` layer
-- **ralt**: tap=`ret`, hold=`sft` layer
-- **rctl**: tap=`esc`, hold=`num` layer
-- **spc**: tap=`spc`, hold=`nav` layer
-
-### Nav (space + key)
-- `i/j/k/l` → `M-up/M-left/M-down/M-right`
-- `a/s/d/f/g` → `M-1` … `M-5`
-- Other keys → `M-{key}` for window management
-
-### Num (rctl + key)
-- Home row: `1 2 3 4 5`
-- Bottom row: `6 7 8 9 0`
-- `i/j/k/l` → up/left/down/right arrows
-- **lalt** in num layer → `sym` layer
-
-### Sym (rctl + lalt + key)
-See `sym-layer-cheatsheet.txt`.
-
-### Sft (ralt + key)
-- All keys shifted (`S-a`, `S-b`, …)
-- **lalt** in sft layer → num layer (works on split keyboard, limited on laptop)
-
-### Ctl (lalt + key)
-- All keys with control (`C-a`, `C-b`, …)
-- **ralt** in ctl layer → sym layer (works on split keyboard, limited on laptop)
-
-## Chords
-
-All chords share a 100ms timeout:
-
-- `q+w` → esc
-- `d+f` → tab
-- `w+x` → switch to game layer
-- `c+v` → `M-spc`
-- `x+c` → `M-A-spc`
-- `esc+tab` → back to base layer (from game layer)
-
-## Timeouts
-
-- `tap-timeout`: 150ms
-- `hold-timeout`: 300ms
-- `short-hold-timeout` (ralt): 150ms
-- `chord-timeout`: 100ms (all chords)
-
-## Known issue: sequential layer activation on laptop keyboards
-
-Sequential activation (`ralt`→`lalt` for num, `lalt`→`ralt` for sym) blocks certain keys on laptop keyboards: `a f c v b n ; ' , . /` and digits `1 2 3 4 5`.
-
-This is a laptop keyboard matrix/rollover limitation, not a kanata problem — the same config works flawlessly on the split keyboard. Workarounds: use the split keyboard, or use `rctl+lalt` for sym (rctl→num→lalt→sym works on both).
-
-## Validation and status
-
-```bash
-kanata --check --cfg ~/.config/kanata/config.kbd
-systemctl --user status kanata
-journalctl --user -u kanata -e
-```
+- Split keyboard (QMK/Vial): `chord-timeout` is 100ms for cross-half latency —
+  don't lower it.
+- **Laptop keyboard matrix limitation (inherited from the previous config):**
+  holding two thumb keys (`lalt`+`ralt`) blocks some keys on the laptop's
+  built-in keyboard — notably `n` (right-side keys; left-side keys like
+  `d f v` still register). The blocked key press never reaches kanata, so
+  nothing emits. This is a hardware matrix/rollover limitation, not a kanata
+  bug — the split keyboard does not have it. When in doubt, verify combos on
+  the split or with `kanata_simulated_input` before debugging the config.
+- The digit row isn't mapped — physical digits (and F-keys, arrows, etc.)
+  pass through and pick up held modifiers.
+- Validation: `kanata --check …`, `systemctl --user status kanata`,
+  `journalctl --user -u kanata -e`.
