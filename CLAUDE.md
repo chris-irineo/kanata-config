@@ -18,7 +18,7 @@ which `require`s `bindings.lua`).
   watcher). The overlay card content renders from `config.kbd` at show time.
   No debounce by default (`num`/`sym` are deliberate); layers mapping fewer
   than `MIN_MAPPED` (3) keys are skipped, which is what keeps the thin `sft`
-  layer from flashing a card.
+  and `ctl` layers from flashing a card.
 
 ## Architecture (do not "fix" into layers)
 
@@ -30,6 +30,12 @@ six combo layers).
 
 - `ralt` = `(multi lsft (layer-while-held sft))`: Shift emission + thin layer whose
   only remap is `lalt` (tap `bspc`, hold `lctl`). Everything else in `sft` is `_`.
+- `lalt` = `(multi lctl (layer-while-held ctl))`: the mirrored idiom — the thin
+  `ctl` layer's only remap is `spc` (hold `lsft`). `lalt`-first+`spc` = Ctrl+Shift
+  (app-shortcut grammar; the laptop-safe pair); `spc`-first+`lalt` = Ctrl+Super,
+  unchanged (Omarchy panels/menus/clipboard manager). Kanata locks a key's action
+  at its press, so the thumb-roll order picks the namespace — deliberate, do not
+  unify. This swaps WHICH real modifier is emitted, not a `C-`/`M-` remap layer.
 - Tap-hold VARIANT POLICY — per key, do not unify (each choice fixes a real bug):
   - `spc` = `tap-hold-release`. Space is rolled into the next letter constantly
     while typing; release-commit keeps natural rolls (space released first) as
@@ -48,7 +54,7 @@ six combo layers).
   digits/symbols come from num/sym layers and the emission makes passthrough keys
   pick up held modifiers (`spc+6` → `SUPER+6`).
 - One chord: `d+f` → tab. Chorded keys: `d`, `f` only.
-- Layers: `base`, `sft` (thin), `num`, `sym`.
+- Layers: `base`, `sft` (thin), `ctl` (thin), `num`, `sym`.
 
 ## Workflow
 
@@ -85,9 +91,11 @@ workspace helpers like `o.workspaces.focus(N)` — don't substitute raw
   `lalt`+`ralt` blocks `a f x c v b n ; ' , . /`; `ralt`+`spc` blocks
   `i j k m`; `spc`+`rctl` blocks `j`; `lalt`+`spc` blocks `,`;
   `lalt`+`rctl` (sym) and `ralt`+`rctl` block nothing.
-  Practical rule: thumb pairs are fine for `sym`/`num`; use native Ctrl/Shift
-  for shortcut chords. Do not chase these as config bugs — verify with
-  `kanata_simulated_input` (config-level truth) or on the split keyboard.
+  Practical rule: thumb pairs are fine for `sym`/`num`; `Ctrl+Shift` has a
+  thumb path (`lalt` first, then `spc` — only `,` blocked); `Super+Shift`
+  chords stay native on the laptop. Do not chase these as config bugs —
+  verify with `kanata_simulated_input` (config-level truth) or on the split
+  keyboard.
 - Before ANY combo debugging, run `kanata --list`: the split and the laptop
   are different hardware with different behavior, and most "mysterious"
   failures on the laptop turn out to be matrix blocks, not config bugs.

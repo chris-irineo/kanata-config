@@ -19,21 +19,30 @@
   ;;   lalt/ralt/rctl = tap-hold-press: chords fire at the second keypress
   ;;   (d+f → tab), so the modifier must already be committed — a release-
   ;;   commit would land after the chord output.
-  lalt (tap-hold-press $tap-timeout $hold-timeout C-bspc lctl)
+  ;; lalt's hold also holds the thin ctl layer (mirrors ralt's sft layer):
+  ;;   it swaps WHICH real modifier spc emits (lsft, not lmet) — still pure
+  ;;   emission, not a C-/M- remap layer. lalt-first + spc = Ctrl+Shift (the
+  ;;   app-shortcut grammar, laptop-safe pair); spc-first + lalt = Ctrl+Super,
+  ;;   kept for the Omarchy panel/menu grammar. Thumb-roll order picks which.
+  lalt (tap-hold-press $tap-timeout $hold-timeout C-bspc (multi lctl (layer-while-held ctl)))
   spc  (tap-hold-release $tap-timeout $hold-timeout spc lmet)
   ralt (tap-hold-press $tap-timeout $short-hold-timeout ret (multi lsft (layer-while-held sft)))
   rctl (tap-hold-press $tap-timeout $hold-timeout esc (layer-while-held num))
 
   ;; ── The one chord: d+f = Tab ──────────────────────────────────────
-  ;; Thumb holds supply modifiers: lalt+d+f = C-tab, spc+ralt+d+f =
-  ;; C-M-S-tab, etc. Works from every layer (sft falls through to base).
+  ;; Thumb holds supply modifiers: lalt+d+f = C-tab, lalt+spc+d+f = C-S-tab,
+  ;; spc+ralt+d+f = C-M-S-tab, etc. Works from every layer (thin layers
+  ;; fall through to base).
   d (chord base_chords d)
   f (chord base_chords f)
 
   ;; Layer thumbs — laltsft uses press (its hold must be committed before
-  ;; chord outputs; it only exists while ralt is deliberately held).
+  ;; chord outputs; it only exists while ralt is deliberately held);
+  ;; spcctl uses release for the same typing-safety as @spc (space rolls
+  ;; stay taps; it only exists while lalt is deliberately held).
   laltnum (layer-while-held sym)
   laltsft (tap-hold-press $tap-timeout $short-hold-timeout bspc lctl)
+  spcctl  (tap-hold-release $tap-timeout $hold-timeout spc lsft)
 )
 
 (defchords base_chords $chord-timeout
@@ -67,6 +76,17 @@
   _        _        _        _        _        _        _        _        _        _        _
   _        _        _        _        _        _        _        _        _        _
                               @laltsft _        _        _
+)
+
+;; Ctrl (lalt held) — thin layer: only spc differs (hold = Shift, not
+;; Super), so lalt-first + spc = Ctrl+Shift. spc-first + lalt stays
+;; Ctrl+Super: kanata locks a key's action at press, so the roll order
+;; picks the namespace.
+(deflayer ctl
+  _        _        _        _        _        _        _        _        _        _
+  _        _        _        _        _        _        _        _        _        _        _
+  _        _        _        _        _        _        _        _        _        _
+                              _        @spcctl  _        _
 )
 
 ;; Num (rctl) — digits and arrows. Hold lalt (rctl first) for the sym layer.

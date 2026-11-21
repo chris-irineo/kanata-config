@@ -21,15 +21,21 @@ Hold modifiers **compose** — kanata emits real keycodes, so the OS combines th
 | `lalt` | any key | `Ctrl-x` |
 | `spc` | any key | `Super-x` (Omarchy binds) |
 | `ralt` | any key | `Shift-x` |
-| `lalt+spc` | `v` | `Ctrl+Super+V` → Omarchy clipboard manager |
+| `spc` then `lalt` — rest the blade on `spc`, drop the knuckle onto `lalt` | any key | `Ctrl+Super-x` → Omarchy grammar: `v` clipboard manager, `a` audio, `n` network, `l` lock … |
+| `lalt` then `spc` | any key | `Ctrl+Shift-x` → app grammar: `n` incognito / go-to-file, `t` reopen tab, `v` paste plain, terminal `c/v` copy-paste |
 | any combo | `d`+`f` | Tab with those modifiers (`C-tab`, `M-tab`, `C-S-tab`, …) |
 | `ralt` | tap `lalt` | plain `bspc` (char delete; `lalt` tap alone is word delete) |
 | `lalt` | digits | `Ctrl-1..0` (browser tab jumping; digits pass through) |
 
 **One chord: `d+f` = Tab** (100ms; works under every modifier combo).
 
-**Documented asymmetry:** `rctl` then `lalt` → sym layer; `lalt` then `rctl` →
-`Ctrl+digit`. Press the sym thumb (`rctl`) first for symbols.
+**Documented asymmetries:** `rctl` then `lalt` → sym layer; `lalt` then `rctl` →
+`Ctrl+digit`. Press the sym thumb (`rctl`) first for symbols. `lalt`+`spc` is
+order-split along the thumb roll: one roll rests the blade on `spc` and drops
+the first knuckle onto `lalt` → **Ctrl+Super** (Omarchy panels/menus); leading
+with `lalt` → **Ctrl+Shift** (the app-shortcut grammar — the laptop-safe pair,
+since the matrix only blocks `,` here). Whichever end of the thumb lands first
+picks the namespace.
 
 **Num (rctl + key):** home row `a s d f g` → `1 2 3 4 5`, bottom row → `6 7 8 9 0`,
 `i j k l` → arrows. **Sym (rctl, then lalt):** see `sym-layer-cheatsheet.txt`.
@@ -128,17 +134,19 @@ the user out of the keylogging-capable `input` group.
 
   | held | blocked |
   |------|---------|
-  | `lalt`+`spc` (Ctrl+Super) | `,` |
+  | `lalt`+`spc` (Ctrl+Shift lalt-first; rolled spc-first = Ctrl+Super) | `,` |
   | `lalt`+`ralt` (Ctrl+Shift) | `a f x c v b n ; ' , . /` |
   | `lalt`+`rctl` (Ctrl, then sym) | **nothing** — symbols are safe |
   | `ralt`+`spc` (Shift+Super) | `i j k m` |
   | `spc`+`rctl` (Super, then num) | `j` |
   | `ralt`+`rctl` (Shift+Ctrl) | nothing |
 
-  House rule: **keep thumb pairs for `sym`/`num`, use native Ctrl/Shift for
-  shortcut chords.** `Ctrl+Shift+F/V/C/N` and `Super+Shift+J/K` are the ones
-  this bites in practice (the `lalt`+`ralt` and `ralt`+`spc` rows) —
-  `Super+Shift+H/L` (swap left/right) survive on the laptop.
+  House rule: **thumb pairs are for `sym`/`num`; `Ctrl+Shift` chords have a
+  thumb path — `lalt` first, then `spc` (the clean pair; only `,` blocked, and
+  nothing common lives on `Ctrl+Shift+,`); `Super+Shift` chords stay native
+  on the laptop.** The rows the matrix still bites: `Ctrl+Shift` via
+  `lalt`+`ralt` (use the `spc` roll instead) and `Super+Shift+J/K` via
+  `ralt`+`spc` — `Super+Shift+H/L` (swap left/right) survive.
   Two entries are intermittent rather than solid — `,` only failed in the three
   pairs without `rctl`, and `e` dropped once and passed once — so treat those
   as unconfirmed.
