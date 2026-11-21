@@ -1,7 +1,10 @@
 SYM LAYER (rctl + lalt + key)
 ─────────────────────────────
 ~  `  [  ]  {     }  |  \  <  >
-!  @  #  $  %     -  =  +  "  :  '
-^  &  *  (  )     _  /  ,  .  ?
+!  @  #  $  %     -  =  +  ·  ·  ·
+^  &  *  (  )     _  ·  ·  ·  ·
 
-? = shift of the / key · " at l · / at m · , . stay at their base keys
+Only symbols that don't live on the alpha cluster.
+· = the num layer underneath shines through (word jumps at ; ' ,
+  PgDn at m, < > at o p) or the base key types itself (, . /).
+? : " are fastest as ralt + their base keys.

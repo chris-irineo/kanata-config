@@ -89,29 +89,34 @@
                               _        @spcctl  _        _
 )
 
-;; Num (rctl) — digits + one-hand editing pad. hjkl = vim arrows; y/o
-;; (same columns, one row up) = word jumps — C-left/right double as
-;; browser back/forward; u = undo, i = redo, p = paste (C-S-v, the
-;; system's paste grammar); the bottom strip deletes word← char← char→
-;; word→ (n m , .). Hold ralt too and any motion SELECTS instead
-;; (ralt+rctl blocks nothing on the laptop matrix). Hold lalt (rctl
-;; first) for the sym layer.
+;; Num (rctl) — calculator + navigation pad, one thumb-hold. Digits
+;; a..g = 1-5, z..b = 6-0. Top row = operator strip: q w e r t give
+;; / * - + =, y u i o p give ( ) % < > — ( ) % spare you digit-row
+;; reaches; < > turn <= and >= into one-hold rolls against = at t.
+;; hjkl = vim arrows; ; ' = word jumps (C-left/right — also browser
+;; back/forward). n m = PgUp/PgDn for scroll-heavy reading; , . /
+;; fall through so decimals, paths and e-notation type natively.
+;; Hold ralt too and any motion SELECTS instead (ralt+rctl blocks
+;; nothing on the laptop matrix). Hold lalt (rctl first) for sym.
 (deflayer num
-  /        S-8      -        S-=      =        C-left   C-z      C-S-z    C-right  C-S-v
-  1        2        3        4        5        left     down     up       right    _        _
-  6        7        8        9        0        C-bspc   bspc     del      C-del    _
+  /        S-8      -        S-=      =        S-9      S-0      S-5      S-,      S-.
+  1        2        3        4        5        left     down     up       right    C-left   C-right
+  6        7        8        9        0        pgup     pgdn     _        _        _
                               @laltnum _        _        _
 )
 
-;; Sym (rctl, then lalt) — see sym-layer-cheatsheet.txt. Getreuer
-;; structure kept: shifted digits in digit order (a..g, z..b), bracket
-;; pairs adjacent ([ ] { } on e r t y). Fixes: , . stay at their base
-;; keys and the bottom strip m , . / reads / , . ? (? = shift of the
-;; / key); l = " completes the home-row run - = + " : '. One symbol
-;; per key, no duplicates; plain ; and ' echo their base positions.
+;; Sym (rctl, then lalt) — only symbols whose native base key is
+;; OUTSIDE the alpha cluster: shifted digits in digit order (a..g,
+;; z..b — same positions as num's digits), ` ~ at q w, the bracket
+;; family [ ] { } | \ on e r t y u i, math - = + on h j k, _ on n.
+;; Everything else is faster as ralt + the base key — one thumb, no
+;; layer — so those slots go transparent and INHERIT the num layer
+;; underneath: o p → < > (no duplicate: sym never hosts them), ; ' →
+;; word jumps, m → PgDn, and , . / fall all the way to base. The
+;; overlay card resolves inheritance; see sym-layer-cheatsheet.txt.
 (deflayer sym
-  S-grv    grv      [        ]        S-[      S-]      S-\      \        S-,      S-.
-  S-1      S-2      S-3      S-4      S-5      -        =        S-=      S-'      S-;      '
-  S-6      S-7      S-8      S-9      S-0      S--      /        ,        .        S-/
+  S-grv    grv      [        ]        S-[      S-]      S-\      \        _        _
+  S-1      S-2      S-3      S-4      S-5      -        =        S-=      _        _        _
+  S-6      S-7      S-8      S-9      S-0      S--      _        _        _        _
                               _        _        _        _
 )

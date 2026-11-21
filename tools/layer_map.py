@@ -312,6 +312,30 @@ def load(path=CONFIG):
                 cells.append({"key": PHYS.get(key, key), "out": label or ""})
             grid.append(cells)
         layers[name] = {"name": name, "rows": grid}
+
+    # Transparent cells (_) do not fall to the OS directly — they fall to
+    # the layer below in the active stack. num sits on base (blank = the
+    # physical key), and sym is only ever entered from num (rctl, then
+    # lalt), so resolve sym's blanks against num. Alpha rows only: the
+    # thumb row keeps its raw labels (that is where you switch layers).
+    def key_glyph(r, c):
+        return pretty_key(src_rows[r][c])
+
+    def resolve(name, under_name):
+        if name not in layers or under_name not in layers:
+            return
+        under = layers[under_name]["rows"]
+        for r, row in enumerate(layers[name]["rows"][:3]):
+            for c, cell in enumerate(row):
+                if cell["out"]:
+                    continue
+                if r < len(under) and c < len(under[r]) and under[r][c]["out"]:
+                    cell["out"] = under[r][c]["out"]
+                else:
+                    cell["out"] = key_glyph(r, c)
+
+    resolve("num", "base")  # base labels are blank → physical key glyph
+    resolve("sym", "num")   # after num is resolved
     return layers
 
 

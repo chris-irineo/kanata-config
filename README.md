@@ -38,11 +38,14 @@ since the matrix only blocks `,` here). Whichever end of the thumb lands first
 picks the namespace.
 
 **Num (rctl + key):** `a s d f g` → `1 2 3 4 5`, `z x c v b` → `6 7 8 9 0`,
-plus a right-hand editing pad: `h j k l` → ←↓↑→ (vim), `y`/`o` (same columns,
-row above) → word jumps (`C-left`/`C-right` — also browser back/forward),
-`u`/`i` → undo/redo, `p` → paste (`C-S-v`), `n m , .` → delete
-word←/char←/char→/word→. Hold `ralt` too and any motion **selects** instead.
-**Sym (rctl, then lalt):** see `sym-layer-cheatsheet.txt`.
+top row = operator strip: `q w e r t` → `/ * - + =`, `y u i o p` → `( ) % < >`
+(`( ) %` avoid digit-row reaches; `< >` make `<=`/`>=` one-hold rolls against
+`=` at `t`). `h j k l` → ←↓↑→ (vim), `;`/`'` → word jumps (`C-left`/`C-right` —
+also browser back/forward), `n m` → PgUp/PgDn; `, . /` fall through, so decimals,
+paths, and `1.5e3` notation type natively. Hold `ralt` too and any motion
+**selects** instead. **Sym (rctl, then lalt):** only symbols outside the alpha
+cluster; blanks inherit the num layer underneath (`< >` at `o p`, word jumps,
+PgUp/PgDn) — the overlay card resolves it. See `sym-layer-cheatsheet.txt`.
 
 ## Window management (Omarchy side)
 
