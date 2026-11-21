@@ -118,13 +118,29 @@ the user out of the keylogging-capable `input` group.
 
 - Split keyboard (QMK/Vial): `chord-timeout` is 100ms for cross-half latency —
   don't lower it.
-- **Laptop keyboard matrix limitation (inherited from the previous config):**
-  holding two thumb keys (`lalt`+`ralt`) blocks some keys on the laptop's
-  built-in keyboard — notably `n` (right-side keys; left-side keys like
-  `d f v` still register). The blocked key press never reaches kanata, so
-  nothing emits. This is a hardware matrix/rollover limitation, not a kanata
-  bug — the split keyboard does not have it. When in doubt, verify combos on
-  the split or with `kanata_simulated_input` before debugging the config.
+- **Laptop keyboard matrix limitation** — measured, not guessed (2026-11-20,
+  deliberate passes ×3 letter rows, control pass 31/31 clean). Holding two
+  thumb keys makes the laptop's built-in keyboard drop the third keypress; the
+  press never reaches kanata, so nothing emits. This is a hardware
+  matrix/rollover limit, not a kanata bug — the split keyboard does not have it.
+
+  | held | blocked |
+  |------|---------|
+  | `lalt`+`spc` (Ctrl+Super) | `,` |
+  | `lalt`+`ralt` (Ctrl+Shift) | `a f x c v b n ; ' , . /` |
+  | `lalt`+`rctl` (Ctrl, then sym) | **nothing** — symbols are safe |
+  | `ralt`+`spc` (Shift+Super) | `i j k m` |
+  | `spc`+`rctl` (Super, then num) | `j` |
+  | `ralt`+`rctl` (Shift+Ctrl) | nothing |
+
+  House rule: **keep thumb pairs for `sym`/`num`, use native Ctrl/Shift for
+  shortcut chords.** `Ctrl+Shift+F/V/C/N` and `Super+Shift+J` are the ones this
+  bites in practice (the `lalt`+`ralt` and `ralt`+`spc` rows).
+  Two entries are intermittent rather than solid — `,` only failed in the three
+  pairs without `rctl`, and `e` dropped once and passed once — so treat those
+  as unconfirmed.
+  When in doubt, verify on the split or with `kanata_simulated_input` before
+  debugging the config.
 - The digit row isn't mapped — physical digits (and F-keys, arrows, etc.)
   pass through and pick up held modifiers.
 - Validation: `kanata --check …`, `systemctl --user status kanata`,

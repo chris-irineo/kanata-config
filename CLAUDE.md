@@ -80,10 +80,14 @@ workspace helpers like `o.workspaces.focus(N)` — don't substitute raw
 - Split-keyboard latency: do not lower `chord-timeout` below 100ms.
 - Keep aliases ≤8 chars, `[action][layer]` naming (e.g. `laltnum`).
 - Anything window-manager-ish belongs in `bindings.lua`, not `config.kbd`.
-- **Laptop matrix limitation**: holding `lalt`+`ralt` on the laptop's built-in
-  keyboard blocks some keys (notably `n`) — the press never reaches kanata.
-  Do not chase these as config bugs: verify with `kanata_simulated_input`
-  (config-level truth) or on the split keyboard before debugging.
+- **Laptop matrix limitation** (measured 2026-11-20; full table in README):
+  holding two thumb keys drops the third keypress before kanata sees it.
+  `lalt`+`ralt` blocks `a f x c v b n ; ' , . /`; `ralt`+`spc` blocks
+  `i j k m`; `spc`+`rctl` blocks `j`; `lalt`+`spc` blocks `,`;
+  `lalt`+`rctl` (sym) and `ralt`+`rctl` block nothing.
+  Practical rule: thumb pairs are fine for `sym`/`num`; use native Ctrl/Shift
+  for shortcut chords. Do not chase these as config bugs — verify with
+  `kanata_simulated_input` (config-level truth) or on the split keyboard.
 - Before ANY combo debugging, run `kanata --list`: the split and the laptop
   are different hardware with different behavior, and most "mysterious"
   failures on the laptop turn out to be matrix blocks, not config bugs.
