@@ -43,11 +43,13 @@ navigates, Super+Shift moves.** Defined in `~/.config/hypr/bindings.lua`:
 |---|---|
 | `spc` + `a s d f g` | workspace 1–5 (digits: 6–10) |
 | `spc+ralt` + `a s d f g` | move window → workspace 1–5 (digits: 6–10) |
-| `spc` + `i j k l` | focus up/left/down/right |
-| `spc+ralt` + `i j k l` | swap window |
+| `spc` + `h j k l` | focus left/down/up/right (vim grammar) |
+| `spc+ralt` + `h j k l` | swap window |
 | `spc` + `n` | Omarchy menu |
-| `spc` + `h b r u z y` | scratchpad / fullscreen / grouping / split / layout / keybinds |
-| `spc+ralt` + `h b r` | send to scratchpad / full-width / pull out of group |
+| `spc` + `semicolon` | scratchpad (`spc+ralt+;` = move window to it) |
+| `spc` + `h b r u z y` | fullscreen / grouping / split / layout / keybinds |
+| `spc+ralt` + `b r` | full-width / pull out of group |
+| `spc` + `i` | input language (`spc+ralt+i` = back) — Omarchy defaults |
 
 Omarchy defaults that already work with no bind: `spc+q/w` close, `spc+t` float,
 `spc+m` minimize, `spc+c/v/x/a` universal clipboard, `spc+tab` next workspace,
@@ -134,8 +136,9 @@ the user out of the keylogging-capable `input` group.
   | `ralt`+`rctl` (Shift+Ctrl) | nothing |
 
   House rule: **keep thumb pairs for `sym`/`num`, use native Ctrl/Shift for
-  shortcut chords.** `Ctrl+Shift+F/V/C/N` and `Super+Shift+J` are the ones this
-  bites in practice (the `lalt`+`ralt` and `ralt`+`spc` rows).
+  shortcut chords.** `Ctrl+Shift+F/V/C/N` and `Super+Shift+J/K` are the ones
+  this bites in practice (the `lalt`+`ralt` and `ralt`+`spc` rows) —
+  `Super+Shift+H/L` (swap left/right) survive on the laptop.
   Two entries are intermittent rather than solid — `,` only failed in the three
   pairs without `rctl`, and `e` dropped once and passed once — so treat those
   as unconfirmed.
