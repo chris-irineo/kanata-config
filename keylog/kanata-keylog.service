@@ -1,0 +1,15 @@
+[Unit]
+Description=Kanata output keylogger (aggregate-only, no raw keystrokes on disk)
+Documentation=file://%h/.config/kanata/keylog/README.md
+
+[Service]
+Type=simple
+ExecStart=%h/.config/kanata/keylog/keylog.py
+Restart=on-failure
+RestartSec=3
+# Graceful shutdown flushes aggregates (5 min cadence otherwise)
+KillSignal=SIGTERM
+TimeoutStopSec=10
+
+[Install]
+WantedBy=default.target
