@@ -36,14 +36,17 @@
   d (chord base_chords d)
   f (chord base_chords f)
 
-  ;; ── Caps: dictation key ──────────────────────────────────────────
-  ;; Tap = C-M-x — hits the Omarchy SUPER+CTRL+X "Toggle dictation" bind
-  ;; in bindings.lua. Hold ≥300ms = f9 down, and releasing caps lifts f9,
-  ;; so the Omarchy bind_hold does push-to-talk (start on down, stop on
-  ;; release). Deliberate key, never typed through → press-commit, like
-  ;; the other non-alpha actions. caps is `_` in every other layer, so it
-  ;; falls through and dictation works from num/sym too.
+  ;; ── Dictation keys: caps and rsft ────────────────────────────────
+  ;; Either key: tap = C-M-x — hits the Omarchy SUPER+CTRL+X "Toggle
+  ;; dictation" bind in bindings.lua. Hold ≥300ms = f9 down, and
+  ;; releasing the key lifts f9, so the Omarchy bind_hold does
+  ;; push-to-talk (start on down, stop on release). Deliberate keys,
+  ;; never typed through → press-commit, like the other non-alpha
+  ;; actions. Both are `_` in every other layer, so dictation works
+  ;; from num/sym too. rsft is spare because Shift is the ralt thumb
+  ;; emission (native left shift still passes through).
   caps (tap-hold-press $tap-timeout $hold-timeout C-M-x f9)
+  rsft (tap-hold-press $tap-timeout $hold-timeout C-M-x f9)
 
   ;; Layer thumbs — laltsft uses press (its hold must be committed before
   ;; chord outputs; it only exists while ralt is deliberately held);
@@ -60,21 +63,21 @@
   (d f) tab
 )
 
-;; Three rows + thumbs; caps (row 2, left of a) is the dictation key.
-;; The physical digit row is not mapped: digits type via the num layer
-;; (rctl), and passthrough keys still pick up the emitted modifiers
-;; (spc+6 → SUPER+6 workspace, etc.).
+;; Three rows + thumbs; caps (row 2, left of a) and rsft (row 3, right
+;; of /) are the dictation keys. The physical digit row is not mapped:
+;; digits type via the num layer (rctl), and passthrough keys still pick
+;; up the emitted modifiers (spc+6 → SUPER+6 workspace, etc.).
 (defsrc
   q        w        e        r        t        y        u        i        o        p
   caps     a        s        d        f        g        h        j        k        l        ;        '
-  z        x        c        v        b        n        m        ,        .        /
+  z        x        c        v        b        n        m        ,        .        /        rsft
                               lalt     spc      ralt     rctl
 )
 
 (deflayer base
   _        _        _        _        _        _        _        _        _        _
   @caps    _        _        @d       @f       _        _        _        _        _        _        _
-  _        _        _        _        _        _        _        _        _        _
+  _        _        _        _        _        _        _        _        _        _        @rsft
                               @lalt    @spc     @ralt    @rctl
 )
 
@@ -84,7 +87,7 @@
 (deflayer sft
   _        _        _        _        _        _        _        _        _        _
   _        _        _        _        _        _        _        _        _        _        _        _
-  _        _        _        _        _        _        _        _        _        _
+  _        _        _        _        _        _        _        _        _        _        _
                               @laltsft _        _        _
 )
 
@@ -95,7 +98,7 @@
 (deflayer ctl
   _        _        _        _        _        _        _        _        _        _
   _        _        _        _        _        _        _        _        _        _        _        _
-  _        _        _        _        _        _        _        _        _        _
+  _        _        _        _        _        _        _        _        _        _        _
                               _        @spcctl  _        _
 )
 
@@ -111,7 +114,7 @@
 (deflayer num
   /        S-8      -        S-=      =        S-9      S-0      S-5      S-,      S-.
   _        1        2        3        4        5        left     down     up       right    C-left   C-right
-  6        7        8        9        0        pgup     pgdn     _        _        _
+  6        7        8        9        0        pgup     pgdn     _        _        _        _
                               @laltnum _        _        _
 )
 
@@ -127,6 +130,6 @@
 (deflayer sym
   S-grv    grv      [        ]        S-[      S-]      S-\      \        _        _
   _        S-1      S-2      S-3      S-4      S-5      -        =        S-=      _        _        _
-  S-6      S-7      S-8      S-9      S-0      S--      _        _        _        _
+  S-6      S-7      S-8      S-9      S-0      S--      _        _        _        _        _
                               _        _        _        _
 )
