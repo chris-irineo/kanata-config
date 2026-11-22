@@ -11,7 +11,7 @@ Never edit anything else: `archive/` is frozen history, and the `*.conf` files i
 `~/.config/hypr/` are dead pre-quattro leftovers (Hyprland loads `hyprland.lua`,
 which `require`s `bindings.lua`).
 
-- Git repo = this directory (remote: `chriskevini/kanata-config`, branch `main`)
+- Git repo = this directory (remote: `chris-irineo/kanata-config`, branch `main`)
 - Hardware: split keyboard (QMK/Vial), hence the 100ms chord timeout
 - Service: `~/.config/systemd/user/kanata.service`, started with
   `--cfg ~/.config/kanata/config.kbd` and `--port 127.0.0.1:7070` (layer overlay
