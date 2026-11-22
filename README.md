@@ -29,6 +29,11 @@ Hold modifiers **compose** — kanata emits real keycodes, so the OS combines th
 
 **One chord: `d+f` = Tab** (100ms; works under every modifier combo).
 
+**Caps = dictation:** tap → `C-M-x` (the Omarchy `SUPER+CTRL+X` toggle bind in
+`bindings.lua`); hold ≥300ms → `f9` down, release → `f9` up (the Omarchy
+`bind_hold F9` push-to-talk). `_` in every other layer, so dictation works
+from `num`/`sym` too. Native caps lock is gone — that's the point.
+
 **Documented asymmetries:** `rctl` then `lalt` → sym layer; `lalt` then `rctl` →
 `Ctrl+digit`. Press the sym thumb (`rctl`) first for symbols. `lalt`+`spc` is
 order-split along the thumb roll: one roll rests the blade on `spc` and drops

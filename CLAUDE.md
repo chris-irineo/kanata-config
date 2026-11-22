@@ -54,6 +54,11 @@ six combo layers).
   digits/symbols come from num/sym layers and the emission makes passthrough keys
   pick up held modifiers (`spc+6` → `SUPER+6`).
 - One chord: `d+f` → tab. Chorded keys: `d`, `f` only.
+- `caps` = dictation key: `tap-hold-press` (press-commit, like the other
+  deliberate keys — caps is never typed through). Tap `C-M-x`, hold ≥300ms =
+  `f9` down (release lifts it) → targets the Omarchy dictation binds in
+  `bindings.lua` (`SUPER+CTRL+X` toggle, `bind_hold F9` push-to-talk).
+  `_` in every other layer, so dictation works from `num`/`sym` too.
 - Layers: `base`, `sft` (thin), `ctl` (thin), `num`, `sym`.
 
 ## Workflow
