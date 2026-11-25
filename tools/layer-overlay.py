@@ -45,6 +45,7 @@ def log(message: str) -> None:
 
 
 def ipc(*args: str) -> None:
+    os.environ.setdefault("OMARCHY_PATH", "/usr/share/omarchy")
     try:
         subprocess.run(
             ["omarchy-shell", "-q", IPC_TARGET, *args],

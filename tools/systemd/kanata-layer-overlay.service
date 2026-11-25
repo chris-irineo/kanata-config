@@ -1,7 +1,9 @@
 [Unit]
 Description=Kanata layer overlay watcher (kanata TCP -> Omarchy shell)
 Documentation=file://%h/.config/kanata/README.md
-After=kanata.service graphical-session.target
+After=kanata.service wayland-session-waitenv.service graphical-session.target
+PartOf=graphical-session.target
+ConditionEnvironment=OMARCHY_PATH
 
 [Service]
 Type=simple
@@ -10,4 +12,4 @@ Restart=always
 RestartSec=2
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
